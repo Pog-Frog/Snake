@@ -33,16 +33,7 @@ draw_borders(){
     echo -ne "\033[$term_rows;3H\033[33m HighScore: $high_score\033[0m";
 }
 
-draw_snake(){
-    echo -ne "\033[${directionX[0]};${directionY[0]}H\033[32m${snek[@]:0:1}\033[0m"
-    for (( i = $((${#snek}-1)); i > 0 ; i-- )) 
-        do
-        update $i
-        echo -ne "\033[${directionX[$i]};${directionY[$i]}H\033[32m${snek[@]:$i:1}\033[0m"
-        (( ${directionX[0]} == ${directionX[$i]} && ${directionY[0]} == ${directionY[$i]} )) && return 1 #crashed
-        [[ ${direction_directives[$((i-1))]} = ${direction_directives[$i]} ]] || direction_directives[$i]=${direction_directives[$((i-1))]}
-    done
-}
+
 
 init_game(){
     clear
@@ -175,7 +166,14 @@ game_loop(){
             grow; (($?==0)) || return 1
         else
             update 0
-            draw_snake
+            echo -ne "\033[${directionX[0]};${directionY[0]}H\033[32m${snek[@]:0:1}\033[0m"
+            for (( i = $((${#snek}-1)); i > 0 ; i-- )) 
+                do
+                update $i
+                echo -ne "\033[${directionX[$i]};${directionY[$i]}H\033[32m${snek[@]:$i:1}\033[0m"
+                (( ${directionX[0]} == ${directionX[$i]} && ${directionY[0]} == ${directionY[$i]} )) && return 1 #crashed
+                [[ ${direction_directives[$((i-1))]} = ${direction_directives[$i]} ]] || direction_directives[$i]=${direction_directives[$((i-1))]}
+            done
         fi
         local tempX=${directionX[0]} tempY=${directionY[0]}
         (( ((tempX>=$((term_rows-1)))) || ((tempX<=1)) || ((tempY>=term_cols)) || ((tempY<=1)) )) && return 1
@@ -190,13 +188,13 @@ game_loop(){
 
 game_over_text=(
     '                                                 '
-    '                  Game Over !!!                  '
+    '                Game Over !!!                    '
     '                                                 '
     '                   Score:                        '
     '               HighScore:                        '
     '          press   q   to quit                    '
     '          press   n   to start a new game        '
-    '          press   s   to change the speed        '
+    '                                                 '
     '                                                 '
 )
 
@@ -213,9 +211,8 @@ start_game_text=(
     '                                                 '
     '                    Welcome                      '
     '                                                 '
-    '         space or enter   pause/play             '
-    '         q                quit at any time       '
-    '         s                change the speed       '
+    '         space or enter   to pause/play          '
+    '         q                to quit the game       '
     '                                                 '
     '         Press <Enter> to start the game         '
     '                                                 '
@@ -224,7 +221,7 @@ start_game_text=(
 start_game(){
     init_game
     local x=$((screen_centerX-5)) y=$((screen_centerY-25))
-    for (( i = 0; i < 9; i++ )); do
+    for (( i = 0; i < 8; i++ )); do
         echo -ne "\033[$((x+i));${y}H\033[45m${start_game_text[$i]}\033[0m";
     done
     while read -n 1 key; do
