@@ -33,8 +33,6 @@ draw_borders(){
     echo -ne "\033[$term_rows;3H\033[33m HighScore: $high_score\033[0m";
 }
 
-
-
 init_game(){
     clear
     start_x=$((term_rows/2)) 
@@ -47,7 +45,7 @@ init_game(){
     randY=0
     flag=1
     score=0
-    temp_sum=0          ##sum-node
+    temp_sum=0          
     food_count=0        ##food_score
     snek="⋅⋅⋅⋅ "
     snake_color="\e[30;42m"
@@ -126,8 +124,7 @@ check_collision(){
         return 1
         fi 
     done
-    echo -ne "\033[${directionX[0]};${directionY[0]}H\033[32m${snek[@]:0:1}\033[0m"
-    draw 
+    echo -ne "\033[${directionX[0]};${directionY[0]}H\033[32m${snek[@]:0:1}\033[0m" 
     return 0
 }
 
@@ -151,13 +148,11 @@ generate_food(){
     flag=0
 }
 
-
-
 game_loop(){
     init_game
     while true
     do
-        read -t 0.1 -n 1 key
+        read -t 0.05 -n 1 key
         [[ $? -eq 0 ]] && controls
         ((flag==0)) || generate_food
         if (( temp_sum > 0 ))
@@ -201,10 +196,10 @@ game_over_text=(
 game_over() {
     local x=$((screen_centerX-4)) y=$((screen_centerY-25))
     for (( i = 0; i < 8; i++ )); do
-        echo -ne "\033[$((x+i));${y}H\033[45m${game_over_text[$i]}\033[0m";
+        echo -ne "\033[$((x+i));${y}H${game_over_text[$i]}\033[0m";
     done
-    echo -ne "\033[$((x+3));$((screen_centerY+1))H\033[45m${score}\033[0m";
-    echo -ne "\033[$((x+4));$((screen_centerY+1))H\033[45m${high_score}\033[0m";
+    echo -ne "\033[$((x+3));$((screen_centerY+1))H${score}\033[0m";
+    echo -ne "\033[$((x+4));$((screen_centerY+1))H${high_score}\033[0m";
 }
 
 start_game_text=(
@@ -222,7 +217,7 @@ start_game(){
     init_game
     local x=$((screen_centerX-5)) y=$((screen_centerY-25))
     for (( i = 0; i < 8; i++ )); do
-        echo -ne "\033[$((x+i));${y}H\033[45m${start_game_text[$i]}\033[0m";
+        echo -ne "\033[$((x+i));${y}H${start_game_text[$i]}\033[0m";
     done
     while read -n 1 key; do
         [[ ${anykey:-enter} = enter ]] && break
